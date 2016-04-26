@@ -80,3 +80,4 @@ moviedb/fixtures/*
 *__pycache__/
 *.pyc
 api/static/.sass-cache/
+migrations/
