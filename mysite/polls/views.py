@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HTTP404
+from django.http import HttpResponse, Http404
 
 from .models import Question
 # Create your views here.
@@ -15,7 +15,7 @@ def detail(request, question_id):
     except Question.DoesNotExist:
         raise HTTP404("Question does not exist.")
     return render(request, 'polls/index.html', {'question': question})
-    
+
 def results(request, question_id):
     response = "You're looking at the results of question %s."
     return HttpResponse(response % question_id)
