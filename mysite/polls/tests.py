@@ -44,7 +44,7 @@ class QuestionMethodTests(TestCase):
         create_question(question_text="Future question.", days=30)
         response = self.client.get(reverse('polls:index'))
         self.assertQuerysetEqual(
-        response.context['latest_question_list'], ['<Question: Future question.>']
+            response.context['latest_question_list'], ['<Question: Future question.>']
         )
 
     def test_index_view_with_past_and_future_question(self):
@@ -55,9 +55,21 @@ class QuestionMethodTests(TestCase):
         create_question(question_text="Future question.", days =30)
         response = self.client.get(reverse('polls:index'))
         self.assertQuerysetEqual(
-        reponse.context['latest_question_list'], ['<Question: past question.']
+            reponse.context['latest_question_list'], ['<Question: past question.']
         )
 
+    def test_index_view_with_two_past_questions(self):
+        """The questions index page should display multiple questions, if they
+        exist."
+        """
+        create_question(question_text="Past question 1.", days=-30)
+        create_question(question_text="Past question 2.", days=-5)
+        response = self.client.get(reverse('polls:index'))
+        self.assertQuerysetEqual(
+            response.context['latest_question_list'],
+            ['<Question: Past question 1.', '<Question: Past question 2.']
+        )
+        
     def test_was_published_recently_with_future_questions(self):
         """
         was_published_recently() should return False for questions with a
