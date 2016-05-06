@@ -35,6 +35,18 @@ class QuestionMethodTests(TestCase):
             response.context['latest_question_list'],
             ['<Question: Past question.>']
         )
+
+    def test_index_view_with_a_future_question(self):
+        """
+        Questions with a pub_date in the future should not be displayed on the
+        index page
+        """
+        create_question(question_text="Future question.", days=30)
+        response = self.client.get(reverse('polls:index'))
+        self.assertQuerysetEqual(
+        response.context['latest_question_list'], ['<Question: Future question.>']
+        )
+
         
     def test_was_published_recently_with_future_questions(self):
         """
