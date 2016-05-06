@@ -16,6 +16,15 @@ def create_question(question_text, days):
 
 class QuestionMethodTests(TestCase):
 
+    def test_index_view_with_no_questions(self):
+        """
+        If no questions exist, an appropriate message should be displayed
+        """
+        response = self.client.get(reverse('polls:index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No polls are available.")
+        self.assertQuerysetEquals(response.context['latest_question_list'], [])
+
     def test_was_published_recently_with_future_questions(self):
         """
         was_published_recently() should return False for questions with a
