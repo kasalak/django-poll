@@ -6,6 +6,14 @@ from .models import Question
 
 # Create your tests here.
 
+def create_question(question_text, days):
+    """
+    Creates a question with the given 'question_text' and published the
+    given number of 'days' offest to now (negative for questions published
+    in the past, positive for questions published in the future)"""
+    time = timezone.now() + datetime.timedelta(days=days)
+    return Question.objects.create(question_text, pub_date=time)
+
 class QuestionMethodTests(TestCase):
 
     def test_was_published_recently_with_future_questions(self):
@@ -35,12 +43,3 @@ class QuestionMethodTests(TestCase):
         time = timezone.now() - datetime.timedelta(hours=1)
         recent_question = Question(pub_date=time)
         self.assertEqual(recent_question.was_published_recently(), True)
-
-    def create_question(question_text, days):
-        """
-        Creates a question with the given 'question_text' and published the
-        given number of 'days' offest to now (negative for questions published
-        in the past, positive for questions published in the future)"""
-        time = timezone.now() + datetime.timedelta(days=days)
-        
-        return Question.objects.create(question_text, pub_date=time)
