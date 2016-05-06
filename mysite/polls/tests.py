@@ -10,9 +10,10 @@ def create_question(question_text, days):
     """
     Creates a question with the given 'question_text' and published the
     given number of 'days' offest to now (negative for questions published
-    in the past, positive for questions published in the future)"""
+    in the past, positive for questions published in the future)
+    """
     time = timezone.now() + datetime.timedelta(days=days)
-    return Question.objects.create(question_text, pub_date=time)
+    return Question.objects.create(question_text=question_text, pub_date=time)
 
 class QuestionMethodTests(TestCase):
 
@@ -43,9 +44,10 @@ class QuestionMethodTests(TestCase):
         """
         create_question(question_text="Future question.", days=30)
         response = self.client.get(reverse('polls:index'))
-        self.assertQuerysetEqual(
-            response.context['latest_question_list'], ['<Question: Future question.>']
-        )
+        self.assertContains(response, "No polls are available.",
+                            status_code=200)
+        self.assertQuerysetEqual(response.context['latest_question_list'],
+        [])
 
     def test_index_view_with_past_and_future_question(self):
         """Even if both past and future questions exist, only past questions should
@@ -55,7 +57,7 @@ class QuestionMethodTests(TestCase):
         create_question(question_text="Future question.", days =30)
         response = self.client.get(reverse('polls:index'))
         self.assertQuerysetEqual(
-            reponse.context['latest_question_list'], ['<Question: past question.']
+            response.context['latest_question_list'], ['<Question: Past question.>']
         )
 
     def test_index_view_with_two_past_questions(self):
@@ -67,7 +69,7 @@ class QuestionMethodTests(TestCase):
         response = self.client.get(reverse('polls:index'))
         self.assertQuerysetEqual(
             response.context['latest_question_list'],
-            ['<Question: Past question 1.', '<Question: Past question 2.']
+            ['<Question: Past question 2.>', '<Question: Past question 1.>']
         )
 
     def test_was_published_recently_with_future_questions(self):
@@ -99,6 +101,7 @@ class QuestionMethodTests(TestCase):
         self.assertEqual(recent_question.was_published_recently(), True)
 
 class QuestionIndexDetailTests(TestCase):
+
     def test_detail_view_with_a_future_question(self):
         """
         The detail view of a question with a pub_date in the future should return a
@@ -106,7 +109,7 @@ class QuestionIndexDetailTests(TestCase):
         """
         future_question = create_question(question_text="Future question.", days=5)
         response = self.client.get(reverse('polls:detail',
-                                    args=(future_question.id)))
+                                    args=(future_question.id,)))
         self.assertEqual(response.status_code, 404)
 
     def test_detail_view_with_a_past_question(self):
@@ -115,6 +118,6 @@ class QuestionIndexDetailTests(TestCase):
         question's text."""
         past_question = create_question(question_text="Past question", days=-5)
         response = self.client.get(reverse('polls:detail',
-                                    args=(past_question.id)))
+                                    args=(past_question.id,)))
         self.assertContains(response, past_question.question_text,
                             status_code=200)
