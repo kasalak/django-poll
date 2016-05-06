@@ -69,7 +69,7 @@ class QuestionMethodTests(TestCase):
             response.context['latest_question_list'],
             ['<Question: Past question 1.', '<Question: Past question 2.']
         )
-        
+
     def test_was_published_recently_with_future_questions(self):
         """
         was_published_recently() should return False for questions with a
